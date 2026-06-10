@@ -74,11 +74,18 @@ Because the application is packaged and deployed directly into `~/Applications/`
 
 ### Creating a Shortcut
 1.  Open the **Shortcuts** app on your Mac.
-2.  Click the **`+` (Add)** icon to create a new shortcut named **"Open The Daily Tech-Prophet"**.
-3.  Drag the **"Open App"** action into the editor workspace.
-4.  Click on the faded blue **"App"** text and search for/select **"The Daily Tech-Prophet"**.
-5.  *Alternatively*, use a **"Run Shell Script"** action containing:
+2.  Click the **`+` (Add)** icon to create a new shortcut named **"The Daily Tech-Prophet"**.
+3.  Drag a **"Run Shell Script"** action into the editor workspace.
+4.  Set the shell script content to:
     ```bash
+    # 1. Prefetch feed curation using Ollama
+    cd "/Users/arvindiyer/development/tech-news"
+    node scripts/fetch_news.js
+
+    # 2. Open the Daily Tech-Prophet desktop application
     open "$HOME/Applications/The Daily Tech-Prophet.app"
     ```
-6.  You can now trigger it from your Menu Bar, Spotlight, Siri, or tie it to custom cron schedules!
+5.  *Alternatively*, for a simple launch without prefetching, you can drag the **"Open App"** action and choose **"The Daily Tech-Prophet"**.
+6.  You can now trigger it from your Menu Bar, Spotlight, Siri, or tie it to custom schedules!
+
+    ![macOS Shortcut open action](docs/images/shortcuts_action.png)

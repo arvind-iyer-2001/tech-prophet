@@ -91,22 +91,28 @@ tail -f ~/Library/Application\ Support/tech-prophet/app.log
 
 Because the packaged application is installed directly in your user's `~/Applications/` directory, macOS indexes it automatically. You can trigger it using the native macOS **Shortcuts** app:
 
-### Option A: Create an "Open App" Shortcut (Recommended)
-1.  Open the native **Shortcuts** app on your Mac.
-2.  Click the **`+` (Add)** icon in the top right to create a new shortcut.
-3.  Name it: **"Open The Daily Tech-Prophet"**.
-4.  In the actions search bar on the right, type **"Open App"** and drag the action into the shortcut editor.
-5.  Click on the faded blue **"App"** text inside the action box.
-6.  Type **"The Daily Tech-Prophet"** in the app search field and select it.
-7.  *Done! You can now run this shortcut from your Mac Menu Bar, Spotlight search, Siri, or double-click to launch it.*
+### Option A: Curation Prefetch & Launch Shortcut (Recommended)
+This method executes the news aggregation script in the background to fetch fresh curation data, and then launches the desktop app. Thanks to the app's cache age check, it will load the pre-fetched data instantly without initiating a duplicate startup fetch!
 
-### Option B: Create a "Run Shell Script" Shortcut (Advanced)
-If you want to chain commands or trigger updates directly:
-1.  Open the **Shortcuts** app.
-2.  Create a new shortcut.
-3.  Search for **"Run Shell Script"** and drag the action into the editor.
-4.  Set the script text to:
-    ```bash
-    open "$HOME/Applications/The Daily Tech-Prophet.app"
-    ```
-5.  *This allows you to quickly launch the app or trigger automatic background runs.*
+1. Open the native **Shortcuts** app on your Mac.
+2. Click the **`+` (Add)** icon in the top right to create a new shortcut.
+3. Name the shortcut: **"The Daily Tech-Prophet"**.
+4. In the actions search bar on the right, type **"Run Shell Script"** and drag the action into the editor.
+5. Set the shell script text to:
+   ```bash
+   # 1. Run news prefetching using Node
+   cd "/Users/arvindiyer/development/tech-news"
+   node scripts/fetch_news.js
+
+   # 2. Launch the desktop application
+   open "$HOME/Applications/The Daily Tech-Prophet.app"
+   ```
+6. *Done! Trigger this shortcut via Spotlight, a menu bar icon, Siri, or custom hotkeys. It will prefetch the news in the background and open the app with the parchment fully loaded!*
+
+### Option B: Simple "Open App" Shortcut
+If you prefer a simple launch shortcut without background prefetching (the app will check cache age and automatically fetch if needed):
+1. Open the native **Shortcuts** app.
+2. Create a new shortcut and search for the **"Open App"** action.
+3. Select **"The Daily Tech-Prophet"** as the target app.
+
+    ![macOS Shortcut open action](docs/images/shortcuts_action.png)

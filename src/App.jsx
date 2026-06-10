@@ -30,10 +30,38 @@ export default function App() {
       setSelectedModel(prefModel);
 
       // Load cached news first so the user sees data instantly
-      await loadCachedNews(prefModel);
+      let shouldAutoFetch = true;
+      try {
+        const cacheData = await window.electronAPI.getNews();
+        if (cacheData && cacheData.articles && cacheData.articles.length > 0) {
+          setNewsData(cacheData);
+          setActiveArticle(cacheData.articles[0]);
+          if (cacheData.model) {
+            setSelectedModel(cacheData.model);
+          } else if (prefModel) {
+            setSelectedModel(prefModel);
+          }
+          
+          // Check if cache is fresh (less than 30 minutes old)
+          if (cacheData.mtimeMs) {
+            const ageMs = Date.now() - cacheData.mtimeMs;
+            const thirtyMinutesMs = 30 * 60 * 1000;
+            if (ageMs < thirtyMinutesMs) {
+              shouldAutoFetch = false;
+              console.log(`Cache is fresh (${Math.round(ageMs / 1000 / 60)} minutes old). Skipping startup fetch.`);
+            } else {
+              console.log(`Cache is stale (${Math.round(ageMs / 1000 / 60)} minutes old). Triggering startup fetch.`);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load cached news:', e);
+      }
 
-      // Automatically trigger curation fetch on launch
-      handleFetchNews(prefModel);
+      // Automatically trigger curation fetch on launch if cache is missing or stale
+      if (shouldAutoFetch) {
+        handleFetchNews(prefModel);
+      }
     };
 
     initApp();

@@ -279,3 +279,41 @@ async function scrapeMetadata(url) {
 }
 
 module.exports = { fetchNews };
+
+if (require.main === module) {
+  const os = require('os');
+  const dotenvPath = path.join(__dirname, '..', '.env');
+  if (fs.existsSync(dotenvPath)) {
+    try {
+      require('dotenv').config({ path: dotenvPath });
+    } catch (e) {
+      // Fallback simple line-by-line env parser
+      const content = fs.readFileSync(dotenvPath, 'utf8');
+      content.split('\n').forEach(line => {
+        const parts = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+        if (parts) {
+          const key = parts[1];
+          let value = parts[2] || '';
+          if (value.startsWith('"') && value.endsWith('"')) {
+            value = value.slice(1, -1);
+          }
+          process.env[key] = value;
+        }
+      });
+    }
+  }
+
+  const modelName = process.env.LOCAL_LLM_MODEL || 'gemma4:latest';
+  const dataDir = path.join(os.homedir(), 'Library', 'Application Support', 'tech-prophet', 'data');
+
+  fetchNews(modelName, dataDir)
+    .then(() => {
+      console.log('Daily Tech-Prophet curation complete.');
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('Curation failed:', err);
+      process.exit(1);
+    });
+}
+

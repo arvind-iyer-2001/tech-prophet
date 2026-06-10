@@ -200,8 +200,13 @@ ipcMain.handle('get-news', async () => {
   const dataPath = path.join(dataDir, 'news.json');
   if (fs.existsSync(dataPath)) {
     try {
+      const stats = fs.statSync(dataPath);
       const content = fs.readFileSync(dataPath, 'utf-8');
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      return {
+        ...parsed,
+        mtimeMs: stats.mtimeMs
+      };
     } catch (e) {
       console.error('Failed to parse cached news:', e);
       return null;
