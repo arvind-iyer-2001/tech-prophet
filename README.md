@@ -100,11 +100,17 @@ This method executes the news aggregation script in the background to fetch fres
 4. In the actions search bar on the right, type **"Run Shell Script"** and drag the action into the editor.
 5. Set the shell script text to:
    ```bash
-   # 1. Run news prefetching using Node
-   cd "/Users/arvindiyer/development/tech-news"
+   # 1. Export paths and initialize Node manager (e.g. FNM or NVM)
+   export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+   if command -v fnm &> /dev/null; then
+     eval "$(fnm env --use-on-cd)"
+   fi
+
+   # 2. Run news prefetching using Node
+   cd "$HOME/development/tech-news"
    node scripts/fetch_news.js
 
-   # 2. Launch the desktop application
+   # 3. Launch the desktop application (if not using native "Open App" action)
    open "$HOME/Applications/The Daily Tech-Prophet.app"
    ```
 6. *Done! Trigger this shortcut via Spotlight, a menu bar icon, Siri, or custom hotkeys. It will prefetch the news in the background and open the app with the parchment fully loaded!*

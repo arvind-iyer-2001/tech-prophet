@@ -78,11 +78,17 @@ Because the application is packaged and deployed directly into `~/Applications/`
 3.  Drag a **"Run Shell Script"** action into the editor workspace.
 4.  Set the shell script content to:
     ```bash
-    # 1. Prefetch feed curation using Ollama
-    cd "/Users/arvindiyer/development/tech-news"
+    # 1. Export paths and initialize Node manager (e.g. FNM or NVM)
+    export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+    if command -v fnm &> /dev/null; then
+      eval "$(fnm env --use-on-cd)"
+    fi
+
+    # 2. Prefetch feed curation using Ollama
+    cd "$HOME/development/tech-news"
     node scripts/fetch_news.js
 
-    # 2. Open the Daily Tech-Prophet desktop application
+    # 3. Open the Daily Tech-Prophet desktop application (if not using native "Open App" action)
     open "$HOME/Applications/The Daily Tech-Prophet.app"
     ```
 5.  *Alternatively*, for a simple launch without prefetching, you can drag the **"Open App"** action and choose **"The Daily Tech-Prophet"**.
