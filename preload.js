@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getNews: () => ipcRenderer.invoke('get-news'),
   openLink: (url) => ipcRenderer.send('open-link', url),
   getOllamaModels: () => ipcRenderer.invoke('get-ollama-models'),
+  getPreferredModel: () => ipcRenderer.invoke('get-preferred-model'),
   onNewsUpdated: (callback) => {
     const subscription = (_event) => callback();
     ipcRenderer.on('news-updated', subscription);

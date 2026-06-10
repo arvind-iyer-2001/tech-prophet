@@ -15,12 +15,28 @@ export default function App() {
   const [likedArticles, setLikedArticles] = useState(new Set());
   const [activeSpell, setActiveSpell] = useState(null);
   const [selectedModel, setSelectedModel] = useState('gemma4:latest');
-  const [availableModels, setAvailableModels] = useState(['gemma4:latest']);
 
-  // Load cached news and Ollama models on startup
+  // Load cached news and auto-fetch on startup
   useEffect(() => {
-    loadCachedNews();
-    loadOllamaModels();
+    const initApp = async () => {
+      let prefModel = 'gemma4:latest';
+      if (window.electronAPI.getPreferredModel) {
+        try {
+          prefModel = await window.electronAPI.getPreferredModel();
+        } catch (e) {
+          console.error('Failed to get preferred model:', e);
+        }
+      }
+      setSelectedModel(prefModel);
+
+      // Load cached news first so the user sees data instantly
+      await loadCachedNews(prefModel);
+
+      // Automatically trigger curation fetch on launch
+      handleFetchNews(prefModel);
+    };
+
+    initApp();
 
     // Subscribe to news.json external updates on disk
     if (window.electronAPI.onNewsUpdated) {
@@ -32,27 +48,7 @@ export default function App() {
     }
   }, []);
 
-  const loadOllamaModels = async () => {
-    try {
-      if (window.electronAPI.getOllamaModels) {
-        const models = await window.electronAPI.getOllamaModels();
-        if (models && models.length > 0) {
-          setAvailableModels(models);
-          // Only default to first returned model if we don't have a cached model
-          setSelectedModel((prev) => {
-            if (prev === 'Gemini 3.5 Flash (Low)' || prev === 'gemma4:latest') {
-              return models[0];
-            }
-            return prev;
-          });
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load Ollama models:', e);
-    }
-  };
-
-  const loadCachedNews = async () => {
+  const loadCachedNews = async (modelOverride) => {
     try {
       const data = await window.electronAPI.getNews();
       if (data && data.articles && data.articles.length > 0) {
@@ -60,20 +56,25 @@ export default function App() {
         setActiveArticle(data.articles[0]);
         if (data.model) {
           setSelectedModel(data.model);
+        } else if (modelOverride) {
+          setSelectedModel(modelOverride);
         }
+        return true;
       }
     } catch (e) {
       console.error('Failed to load cached news:', e);
     }
+    return false;
   };
 
-  const handleFetchNews = async () => {
+  const handleFetchNews = async (modelOverride) => {
+    const targetModel = modelOverride || selectedModel;
     setLoading(true);
     setStatusMessage('Casting news-gathering spells...');
     
     // Cycle status messages to simulate wizard actions
     const messages = [
-      `Summoning ${selectedModel} intelligence...`,
+      `Summoning ${targetModel} intelligence...`,
       'Parsing RSS feed items...',
       'Sorting high-signal scrolls...',
       'Engraving portrait images in copper...',
@@ -89,13 +90,13 @@ export default function App() {
     }, 2500);
 
     try {
-      await window.electronAPI.fetchNews(selectedModel);
+      await window.electronAPI.fetchNews(targetModel);
       clearInterval(interval);
       setStatusMessage('Curation complete! Formatting parchment...');
-      await loadCachedNews();
+      await loadCachedNews(targetModel);
     } catch (e) {
       console.error(e);
-      alert(`Magical transmission failed. Ensure your local Ollama server is running and "${selectedModel}" is installed.`);
+      alert(`Magical transmission failed. Ensure your local Ollama server is running and "${targetModel}" is installed.`);
     } finally {
       clearInterval(interval);
       setLoading(false);
@@ -159,31 +160,11 @@ export default function App() {
           <strong>Curator Status: </strong> Active
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <label htmlFor="model-select" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>🪄 Select Spellcaster: </label>
-          <select
-            id="model-select"
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            style={{
-              background: 'transparent',
-              color: 'var(--color-ink)',
-              border: '1px solid var(--color-ink)',
-              padding: '6px 12px',
-              fontFamily: 'var(--font-serif-display)',
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              outline: 'none',
-              borderRadius: '0'
-            }}
-          >
-            {availableModels.map((model) => (
-              <option key={model} value={model}>
-                {model}
-              </option>
-            ))}
-          </select>
-          <button className="fetch-btn" onClick={handleFetchNews}>
-            Fetch Latest Issue
+          <span style={{ fontSize: '0.9rem', fontStyle: 'italic', marginRight: '10px' }}>
+            Spellcaster: <strong>{selectedModel}</strong>
+          </span>
+          <button className="fetch-btn" onClick={() => handleFetchNews(selectedModel)}>
+            Refresh Issue 🪄
           </button>
         </div>
       </div>

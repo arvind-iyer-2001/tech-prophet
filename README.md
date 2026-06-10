@@ -20,9 +20,10 @@ The application UI is designed to look and feel like a premium magical newspaper
     *   Programmatically parses RSS feeds from Hacker News, TechCrunch, Wired, and VentureBeat.
     *   Filters and aggregates the latest items, formatting a comprehensive system instruction and sending it to your local Ollama completions API.
     *   Curates exactly 10 articles + 1 **Hidden Gem** (less mainstream but highly useful for senior developers) and writes them to a local JSON cache.
-2.  **Dynamic Model Discovery:**
-    *   Electron queries the local Ollama tags API (`http://localhost:11434/api/tags`) at startup.
-    *   Filters out embedding-only models, populating the UI dropdown with only your installed text generation models (e.g. `gemma4:latest`).
+2.  **Preferred Model Configuration:**
+    *   Electron reads your preferred model name directly from the `.env` settings (defaulting to `gemma4:latest`).
+    *   Curation fetches are run automatically using this model on first launch.
+    *   Replaces bulky selector dropdowns with a single, premium **Refresh Issue** button in the header toolbar.
 3.  **Real-Time Disk Synchronization:**
     *   Includes a directory watcher inside the Electron main process that monitors the curation cache folder.
     *   Whenever `news.json` is updated externally (e.g., by the macOS Shortcuts app or a cron job), it pushes an IPC reload event to the frontend, updating your feed in real-time.

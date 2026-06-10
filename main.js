@@ -96,7 +96,26 @@ function getDataDirectory() {
   return dataDir;
 }
 
+function loadEnv() {
+  const dotenvPath = path.join(__dirname, '.env');
+  if (fs.existsSync(dotenvPath)) {
+    const dotenvContent = fs.readFileSync(dotenvPath, 'utf8');
+    dotenvContent.split('\n').forEach(line => {
+      const parts = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+      if (parts) {
+        const key = parts[1];
+        let value = parts[2] || '';
+        if (value.startsWith('"') && value.endsWith('"')) {
+          value = value.slice(1, -1);
+        }
+        process.env[key] = value;
+      }
+    });
+  }
+}
+
 app.whenReady().then(() => {
+  loadEnv();
   setupLogging();
   getDataDirectory();
   
@@ -125,6 +144,11 @@ app.on('will-quit', () => {
   if (newsWatcher) {
     newsWatcher.close();
   }
+});
+
+// Fetch preferred model name from environment variables
+ipcMain.handle('get-preferred-model', async () => {
+  return process.env.LOCAL_LLM_MODEL || 'gemma4:latest';
 });
 
 // Fetch available models from local Ollama tags API
@@ -158,25 +182,8 @@ ipcMain.handle('get-ollama-models', async () => {
 
 // Run script to fetch news using local Ollama model
 ipcMain.handle('fetch-news', async (event, modelName) => {
-  const targetModel = modelName || 'gemma4:latest';
+  const targetModel = modelName || process.env.LOCAL_LLM_MODEL || 'gemma4:latest';
   const dataDir = getDataDirectory();
-
-  // Load local environment settings if available
-  const dotenvPath = path.join(__dirname, '.env');
-  if (fs.existsSync(dotenvPath)) {
-    const dotenvContent = fs.readFileSync(dotenvPath, 'utf8');
-    dotenvContent.split('\n').forEach(line => {
-      const parts = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
-      if (parts) {
-        const key = parts[1];
-        let value = parts[2] || '';
-        if (value.startsWith('"') && value.endsWith('"')) {
-          value = value.slice(1, -1);
-        }
-        process.env[key] = value;
-      }
-    });
-  }
 
   try {
     await fetchNews(targetModel, dataDir);
