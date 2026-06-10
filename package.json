@@ -1,0 +1,43 @@
+{
+  "name": "tech-prophet",
+  "version": "1.0.0",
+  "description": "Personalized Daily Tech-Prophet News Aggregator",
+  "main": "main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.2.1",
+    "dotenv": "^16.4.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3",
+    "vite": "^5.1.6"
+  },
+  "build": {
+    "appId": "com.arvindiyer.techprophet",
+    "productName": "The Daily Tech-Prophet",
+    "mac": {
+      "category": "public.app-category.news",
+      "target": ["dir"]
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "scripts/fetch_news.js",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist_electron"
+    }
+  }
+}
