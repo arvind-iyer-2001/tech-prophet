@@ -65,3 +65,20 @@ Monitor curation runs, subprocesses, and filesystem watcher operations:
     tail -f ~/Library/Application\ Support/tech-prophet/app.log
     ```
 *   **Data Cache:** `~/Library/Application Support/tech-prophet/data/news.json`
+
+---
+
+## 🪄 macOS Shortcuts App Integration
+
+Because the application is packaged and deployed directly into `~/Applications/`, macOS indexes it automatically for search and Shortcuts execution.
+
+### Creating a Shortcut
+1.  Open the **Shortcuts** app on your Mac.
+2.  Click the **`+` (Add)** icon to create a new shortcut named **"Open The Daily Tech-Prophet"**.
+3.  Drag the **"Open App"** action into the editor workspace.
+4.  Click on the faded blue **"App"** text and search for/select **"The Daily Tech-Prophet"**.
+5.  *Alternatively*, use a **"Run Shell Script"** action containing:
+    ```bash
+    open "$HOME/Applications/The Daily Tech-Prophet.app"
+    ```
+6.  You can now trigger it from your Menu Bar, Spotlight, Siri, or tie it to custom cron schedules!

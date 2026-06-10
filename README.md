@@ -84,3 +84,29 @@ All logs, RSS requests, and Ollama completion streams are written in real-time. 
 ```bash
 tail -f ~/Library/Application\ Support/tech-prophet/app.log
 ```
+
+---
+
+## 🪄 macOS Shortcuts App Integration
+
+Because the packaged application is installed directly in your user's `~/Applications/` directory, macOS indexes it automatically. You can trigger it using the native macOS **Shortcuts** app:
+
+### Option A: Create an "Open App" Shortcut (Recommended)
+1.  Open the native **Shortcuts** app on your Mac.
+2.  Click the **`+` (Add)** icon in the top right to create a new shortcut.
+3.  Name it: **"Open The Daily Tech-Prophet"**.
+4.  In the actions search bar on the right, type **"Open App"** and drag the action into the shortcut editor.
+5.  Click on the faded blue **"App"** text inside the action box.
+6.  Type **"The Daily Tech-Prophet"** in the app search field and select it.
+7.  *Done! You can now run this shortcut from your Mac Menu Bar, Spotlight search, Siri, or double-click to launch it.*
+
+### Option B: Create a "Run Shell Script" Shortcut (Advanced)
+If you want to chain commands or trigger updates directly:
+1.  Open the **Shortcuts** app.
+2.  Create a new shortcut.
+3.  Search for **"Run Shell Script"** and drag the action into the editor.
+4.  Set the script text to:
+    ```bash
+    open "$HOME/Applications/The Daily Tech-Prophet.app"
+    ```
+5.  *This allows you to quickly launch the app or trigger automatic background runs.*
